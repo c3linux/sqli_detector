@@ -32,7 +32,7 @@ python3 blind_sqli_detector.py -u "http://testphp.vulnweb.com/artists.php?artist
 ---
 
 TODO:
-- [ ] Add binary search
+- [X] Add binary search
 - [ ] Add POST method
 - [ ] Add Authentication method
 - [ ] Add payloads
